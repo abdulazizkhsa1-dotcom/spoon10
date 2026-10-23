@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عجلة المفاهيم والتعريفات التربوية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Arabic (Cairo & Amiri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Amiri:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#FDF8E2',
+                            200: '#F9ECB4',
+                            300: '#EED676',
+                            400: '#DFBA42',
+                            500: '#C89A23',
+                            600: '#A37913',
+                            700: '#7E5B0B',
+                            800: '#5A3F05',
+                        },
+                        cream: {
+                            50: '#FAF8F5',
+                            100: '#F5EFE6',
+                            200: '#EADFCF',
+                            300: '#D5C3A8',
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at 50% 30%, #FCF9F2 0%, #F3EAE0 60%, #E8D9C8 100%);
+            min-height: 100vh;
+            color: #4A3B22;
+            overflow-x: hidden;
+        }
+
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #B38728 50%, #FBF5B7 75%, #AA771C 100%);
+        }
+
+        .gold-button {
+            background: linear-gradient(180deg, #D4AF37 0%, #AA7C11 100%);
+            box-shadow: 0 6px 20px rgba(170, 124, 17, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+            transition: all 0.25s ease;
+        }
+
+        .gold-button:hover {
+            background: linear-gradient(180deg, #E5C158 0%, #C3901B 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(170, 124, 17, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.8);
+        }
+
+        .gold-button:active {
+            transform: translateY(1px);
+        }
+
+        .gold-card {
+            background: rgba(255, 253, 249, 0.92);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(212, 175, 55, 0.35);
+            box-shadow: 0 10px 30px rgba(138, 100, 23, 0.08);
+        }
+
+        .wheel-container {
+            position: relative;
+            filter: drop-shadow(0 15px 25px rgba(110, 80, 15, 0.25));
+        }
+
+        @keyframes bulbBlink {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 6px #FFF3A1); }
+            50% { opacity: 0.4; filter: drop-shadow(0 0 1px #FFD700); }
+        }
+
+        .bulb-light {
+            animation: bulbBlink 1.5s infinite ease-in-out;
+        }
+
+        .bulb-light:nth-child(even) {
+            animation-delay: 0.75s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .animate-modal {
+            animation: modalFadeIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .clip-polygon-pointer {
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen relative selection:bg-gold-300 selection:text-gold-900">
+
+    <!-- TOP BAR / HEADER -->
+    <header class="w-full max-w-7xl mx-auto px-4 pt-4 pb-2 flex justify-between items-center z-20">
+        <!-- Counter Badge (Right in RTL / Top Right) -->
+        <div class="flex items-center gap-3 bg-white/80 backdrop-blur border-2 border-gold-400/50 rounded-full px-5 py-2 shadow-sm">
+            <div class="w-8 h-8 rounded-full gold-gradient-bg flex items-center justify-center text-white shadow-inner">
+                <i class="fa-solid fa-layer-group text-sm text-amber-900"></i>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="remainingCountHeader" class="text-2xl font-black text-amber-900">0</span>
+                <span class="text-sm font-bold text-amber-700/80">المفاهيم المتبقية</span>
+            </div>
+        </div>
+
+        <!-- Topic Title (Center or Header) -->
+        <div class="hidden sm:flex items-center gap-3 text-right">
+            <div class="text-right">
+                <h3 id="uiHeaderBadge" class="text-sm font-bold text-amber-900 leading-tight">تأثير القضية وأهميتها التربوية</h3>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-900 flex items-center justify-center text-gold-200 shadow-md">
+                <i class="fa-solid fa-graduation-cap text-lg"></i>
+            </div>
+        </div>
+
+        <!-- Admin Panel Switch & Reset -->
+        <div class="flex items-center gap-2">
+            <button onclick="resetGameProgress()" title="إعادة تشغيل العجلة" class="bg-amber-100/80 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-amber-300/60">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span class="hidden sm:inline">إعادة البدء</span>
+            </button>
+            <button onclick="openAdminModal()" class="bg-gradient-to-r from-amber-700 to-amber-900 text-gold-100 hover:brightness-110 px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 border border-gold-400/40">
+                <i class="fa-solid fa-sliders"></i>
+                <span>لوحة التحكم</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-2 flex flex-col justify-between items-center relative z-10">
+
+        <!-- Title Section in Center Top -->
+        <div class="text-center my-2 relative z-10">
+            <div class="inline-block relative">
+                <div class="absolute -top-3 -right-8 text-gold-400 text-xl"><i class="fa-solid fa-sun opacity-60"></i></div>
+                <div class="absolute -top-3 -left-8 text-gold-400 text-xl"><i class="fa-solid fa-sun opacity-60"></i></div>
+                
+                <h1 id="uiMainTitle" class="text-4xl md:text-5xl font-black text-amber-950 tracking-tight leading-tight mb-1">
+                    عجلة الحظ
+                </h1>
+            </div>
+            <p id="uiSubtitle" class="text-sm md:text-base font-bold text-amber-800/90 max-w-2xl mx-auto">
+                أدر العجلة، واكتشف المفهوم التربوي، واقرأ التعريف
+            </p>
+        </div>
+
+        <!-- MAIN GRID: LEFT SIDE QUOTE (TOP-LEFT) & CENTER WHEEL -->
+        <div class="w-full relative flex flex-col lg:flex-row items-center justify-center my-auto py-2">
+
+            <!-- SIDE QUOTE & BOOKS (POSITIONED TOP-LEFT ON DESKTOP) -->
+            <div class="lg:absolute lg:left-4 lg:top-0 flex flex-col items-center lg:items-start text-center lg:text-right mb-6 lg:mb-0 z-20">
+                <div class="space-y-0.5">
+                    <h2 id="uiLeftQuoteMain" class="text-2xl lg:text-3xl font-black text-amber-900 font-amiri leading-tight">
+                        معاً ..
+                    </h2>
+                    <h2 id="uiLeftQuoteSub" class="text-2xl lg:text-3xl font-black text-amber-800 font-amiri leading-tight">
+                        نصنع أثراً تربوياً
+                    </h2>
+                    <div class="w-20 h-1 bg-gradient-to-r from-amber-600 to-transparent rounded-full mt-1 mx-auto lg:mx-0"></div>
+                </div>
+
+                <!-- Vector SVG Books Illustration -->
+                <div class="relative w-36 h-28 lg:w-44 lg:h-32 mt-2 flex items-end justify-center lg:justify-start">
+                    <svg viewBox="0 0 200 160" class="w-full h-full drop-shadow-md">
+                        <path d="M20 130 Q100 145 180 130 L180 150 Q100 165 20 150 Z" fill="#92650F"/>
+                        <path d="M20 130 L20 150 Q100 165 180 150 L180 130 Q100 145 20 130 Z" fill="url(#bookGoldGrad)"/>
+                        <rect x="25" y="132" width="150" height="10" rx="2" fill="#FAF5E8"/>
+                        
+                        <path d="M30 105 Q100 120 170 105 L170 125 Q100 140 30 125 Z" fill="#222"/>
+                        <rect x="35" y="107" width="130" height="10" rx="2" fill="#FAF5E8"/>
+
+                        <path d="M15 80 Q100 95 185 80 L185 100 Q100 115 15 100 Z" fill="#C59A27"/>
+                        <rect x="20" y="82" width="160" height="10" rx="2" fill="#FAF5E8"/>
+
+                        <path d="M50 82 C40 60 20 50 15 30 C30 35 45 45 50 82 Z" fill="#4A7C59"/>
+                        <path d="M50 82 C60 55 85 45 95 25 C80 35 60 50 50 82 Z" fill="#5B9A6F"/>
+                        <path d="M50 82 C50 65 52 40 52 25" stroke="#375D42" stroke-width="2" fill="none"/>
+
+                        <defs>
+                            <linearGradient id="bookGoldGrad" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#B8860B"/>
+                                <stop offset="50%" stop-color="#EED676"/>
+                                <stop offset="100%" stop-color="#92650F"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- CENTER WHEEL AND SPIN BUTTON -->
+            <div class="flex flex-col items-center justify-center mx-auto z-10">
+                <div class="wheel-container relative w-[330px] h-[330px] sm:w-[410px] sm:h-[410px] md:w-[450px] md:h-[450px] flex items-center justify-center">
+                    
+                    <!-- Outer Decorative Ring with Bulbs -->
+                    <div id="wheelBulbRing" class="absolute inset-0 rounded-full border-[10px] border-amber-600/30 bg-gradient-to-b from-amber-500 via-amber-700 to-amber-900 p-2 shadow-2xl flex items-center justify-center">
+                    </div>
+
+                    <!-- Canvas Wheel -->
+                    <canvas id="wheelCanvas" width="800" height="800" class="w-[88%] h-[88%] rounded-full z-10 cursor-pointer transition-transform duration-100 ease-out"></canvas>
+
+                    <!-- Top Wheel Arrow/Pointer -->
+                    <div class="absolute -top-3 z-30 flex flex-col items-center filter drop-shadow-lg">
+                        <div class="w-8 h-10 gold-gradient-bg clip-polygon-pointer rounded-b-md shadow-md border-2 border-white/60"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber-900 -mt-8"></div>
+                    </div>
+
+                    <!-- Center Golden Star Hub -->
+                    <div class="absolute z-20 w-16 h-16 sm:w-20 sm:h-20 rounded-full gold-gradient-bg border-4 border-white shadow-xl flex items-center justify-center pointer-events-none">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-800 flex items-center justify-center text-white shadow-inner">
+                            <i class="fa-solid fa-star text-lg text-gold-200"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remaining Items Counter Below Wheel -->
+                <div class="mt-3 text-xs font-bold bg-amber-900/10 text-amber-900 px-5 py-1.5 rounded-full border border-amber-800/20 shadow-sm">
+                    المفاهيم المتبقية بالعجلة: <span id="remainingCount" class="text-base font-extrabold text-amber-700">0</span>
+                </div>
+
+                <!-- SPIN BUTTON IN CENTER -->
+                <button id="spinBtn" onclick="spinWheel()" class="gold-button mt-4 px-12 py-3.5 rounded-full text-white font-black text-xl tracking-wide flex items-center gap-3 border-2 border-gold-200/80 z-20">
+                    <i class="fa-solid fa-play text-base"></i>
+                    <span>أدر العجلة</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER COPYRIGHT -->
+    <footer class="text-center py-2 text-xs font-bold text-amber-900/60 z-10">
+       
+    </footer>
+
+    <!-- DEFINITION / CONCEPT CARD MODAL -->
+    <div id="conceptModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="gold-card w-full max-w-xl rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-gold-400 animate-modal relative">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center mb-5 pb-3 border-b border-amber-300/60">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl gold-gradient-bg flex items-center justify-center text-amber-950 shadow-sm text-lg">
+                        <i id="conceptModalIcon" class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-extrabold text-amber-700 block">بطاقة مفهوم</span>
+                        <h3 id="conceptModalTitle" class="text-xl font-black text-amber-950">عنوان الشريحة</h3>
+                    </div>
+                </div>
+                <span class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full text-xs font-extrabold border border-amber-300">
+                    مفهوم تربوي
+                </span>
+            </div>
+
+            <!-- Definition Text Content -->
+            <div class="bg-white/80 rounded-2xl p-6 border border-amber-200/80 shadow-inner mb-6">
+                <p id="conceptModalText" class="text-base md:text-lg font-bold text-amber-950 leading-relaxed text-justify">
+                    نص التعريف أو المفهوم هنا...
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex justify-end">
+                <button onclick="closeConceptModal()" class="gold-button w-full sm:w-auto px-8 py-3 rounded-2xl text-white font-extrabold text-base shadow-lg flex items-center justify-center gap-2">
+                    <span>استمرار واستبعاد الشريحة</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALL CONCEPTS COMPLETED MODAL -->
+    <div id="victoryModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="gold-card w-full max-w-md rounded-3xl p-8 text-center shadow-2xl border-4 border-gold-400 animate-modal relative">
+            <div class="w-20 h-20 rounded-full gold-gradient-bg mx-auto flex items-center justify-center text-amber-950 text-4xl shadow-lg mb-4">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2 class="text-3xl font-black text-amber-950 mb-2">أكتملت العجلة بنجاح!</h2>
+            <p class="text-sm font-bold text-amber-800 mb-6 leading-relaxed">
+                لقد قمت باستعراض كافة التعريفات والمفاهيم التربوية الموجودة في العجلة.
+            </p>
+
+            <button onclick="resetGameProgress()" class="gold-button w-full py-3.5 rounded-2xl text-white font-extrabold text-base shadow-lg">
+                <i class="fa-solid fa-rotate-right ml-2"></i> استعراض المفاهيم من جديد
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL MODAL -->
+    <div id="adminModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl border-2 border-amber-400 flex flex-col overflow-hidden animate-modal">
+            
+            <!-- Admin Header -->
+            <div class="bg-gradient-to-r from-amber-800 to-amber-950 text-gold-100 p-5 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-sliders text-2xl text-gold-400"></i>
+                    <div>
+                        <h2 class="text-lg font-black">لوحة التحكم (الإدارة)</h2>
+                        <p class="text-xs text-amber-300/80">تعديل نصوص الواجهة وإدارة الشرائح والتعريفات</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Admin Body Content -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-8 text-right font-sans">
+                
+                <!-- SECTION 1: Page Texts -->
+                <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200">
+                    <h3 class="text-base font-black text-amber-900 mb-4 pb-2 border-b border-amber-200 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-amber-600"></i>
+                        تعديل نصوص الواجهة الرئيسية
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-bold">
+                        <div>
+                            <label class="block text-amber-900 mb-1">العنوان الرئيسي</label>
+                            <input type="text" id="adminMainTitle" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-amber-900 mb-1">الوصف الفرعي</label>
+                            <input type="text" id="adminSubtitle" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-amber-900 mb-1">شعار الهيدر الأيسر</label>
+                            <input type="text" id="adminHeaderBadge" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-amber-900 mb-1">العبارة الجانبية (سطر 1)</label>
+                            <input type="text" id="adminLeftQuoteMain" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-amber-900 mb-1">العبارة الجانبية (سطر 2)</label>
+                            <input type="text" id="adminLeftQuoteSub" class="w-full p-2.5 rounded-xl border border-amber-300 bg-white">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Concepts / Slides Management -->
+                <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-amber-200">
+                        <h3 class="text-base font-black text-amber-900 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-amber-600"></i>
+                            إدارة الشرائح والمفاهيم
+                        </h3>
+                        <button onclick="addNewConceptField()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-plus"></i> إضافة شريحة جديدة
+                        </button>
+                    </div>
+
+                    <div id="adminConceptsContainer" class="space-y-4">
+                        <!-- Concepts rendered via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Admin Footer -->
+            <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center">
+                <button onclick="restoreDefaults()" class="text-xs text-red-600 hover:underline font-bold">
+                    استعادة الإعدادات والبيانات الافتراضية
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeAdminModal()" class="px-5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-200">
+                        إلغاء
+                    </button>
+                    <button onclick="saveAdminChanges()" class="gold-button px-6 py-2 rounded-xl text-xs font-bold text-white">
+                        حفظ التعديلات
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CORE LOGIC & STATE -->
+    <script>
+        const DEFAULT_TEXTS = {
+            mainTitle: "عجلة الحظ",
+            subtitle: "أدر العجلة، واكتشف المفهوم التربوي، واقرأ التعريف",
+            headerBadge: "تأثير القضية وأهميتها التربوية",
+            leftQuoteMain: "معاً ..",
+            leftQuoteSub: "نصنع أثراً تربوياً"
+        };
+
+        const DEFAULT_CONCEPTS = [
+            {
+                id: 1,
+                label: "سؤال 1",
+                icon: "fa-book-open",
+                definition: "التقييم التكويني: هو عملية مستمرة لتجميع شواهد عن تعلم الطلاب لمساعدتهم وتحسين مسار التعليم والتعلم أثناء تنفيذ الدرس."
+            },
+            {
+                id: 2,
+                label: "سؤال 2",
+                icon: "fa-brain",
+                definition: "التفكير النقدي: القدرة على تحليل المعلومات والتقييم الموضوعي للآراء والحجج للوصول إلى قرارات منطقية ومستقلة."
+            },
+            {
+                id: 3,
+                label: "سؤال 3",
+                icon: "fa-people-group",
+                definition: "الفروق الفردية: الاختلافات التباينية الفطرية والمكتسبة بين المتعلمين في القدرات والاهتمامات وسرعة التعلم وأنماطه."
+            },
+            {
+                id: 4,
+                label: "سؤال 4",
+                icon: "fa-seedling",
+                definition: "البيئة الصفية الإيجابية: مناخ تعليمي آمن وداعم يشجع التفاعل والمشاركة ويحفز الدافعية الذاتية نحو التعلم المستمر."
+            },
+            {
+                id: 5,
+                label: "سؤال 5",
+                icon: "fa-bullseye",
+                definition: "الأهداف السلوكية: نواتج التعلم المحددة والقابلة للقياس والملاحظة والمطلوب تحقيقها لدى المتعلم في نهاية الموقف التعليمي."
+            },
+            {
+                id: 6,
+                label: "سؤال 6",
+                icon: "fa-laptop-code",
+                definition: "التكنولوجيا التربوية: منظومة متكاملة لإعداد وتطبيق وتقويم العملية التعليمية باستخدام التقنيات الحديثة لتيسير الفهم."
+            },
+            {
+                id: 7,
+                label: "سؤال 7",
+                icon: "fa-handshake",
+                definition: "التعلم التعاوني: استراتيجية تدريس تعتمد على تنظيم الطلاب في مجموعات صغيرة وتفاعلية لتحقيق أهداف تعليمية مشتركة."
+            },
+            {
+                id: 8,
+                label: "سؤال 8",
+                icon: "fa-comments",
+                definition: "التغذية الراجعة البناءة: معلومات دقيقة ومحددة تُمكّن المتعلم من معرفة نقاط القوة وكيفية معالجة نقاط التطور لديه."
+            }
+        ];
+
+        let appTexts = {};
+        let allConcepts = [];
+        let activeConcepts = [];
+        let isSpinning = false;
+        let currentAngle = 0;
+        let activeConceptIndex = null;
+
+        const sliceColors = [
+            { bg: '#FAF7F0', text: '#5A3F05', accent: '#D4AF37' },
+            { bg: '#2D2820', text: '#FAF7F0', accent: '#EED676' },
+            { bg: '#EFE7D8', text: '#5A3F05', accent: '#AA7C11' },
+            { bg: '#3D3528', text: '#FAF7F0', accent: '#F3E5AB' }
+        ];
+
+        window.onload = function() {
+            loadStoredData();
+            renderUITexts();
+            generateWheelBulbs();
+            drawWheel();
+        };
+
+        function loadStoredData() {
+            const savedTexts = localStorage.getItem('wheel_v3_texts');
+            appTexts = savedTexts ? JSON.parse(savedTexts) : { ...DEFAULT_TEXTS };
+
+            const savedConcepts = localStorage.getItem('wheel_v3_concepts');
+            allConcepts = savedConcepts ? JSON.parse(savedConcepts) : [...DEFAULT_CONCEPTS];
+
+            const savedActive = localStorage.getItem('wheel_v3_active');
+            activeConcepts = savedActive ? JSON.parse(savedActive) : [...allConcepts];
+        }
+
+        function saveData() {
+            localStorage.setItem('wheel_v3_texts', JSON.stringify(appTexts));
+            localStorage.setItem('wheel_v3_concepts', JSON.stringify(allConcepts));
+            localStorage.setItem('wheel_v3_active', JSON.stringify(activeConcepts));
+        }
+
+        function renderUITexts() {
+            document.getElementById('uiMainTitle').innerText = appTexts.mainTitle;
+            document.getElementById('uiSubtitle').innerText = appTexts.subtitle;
+            document.getElementById('uiHeaderBadge').innerText = appTexts.headerBadge;
+            document.getElementById('uiLeftQuoteMain').innerText = appTexts.leftQuoteMain;
+            document.getElementById('uiLeftQuoteSub').innerText = appTexts.leftQuoteSub;
+            
+            const total = activeConcepts.length;
+            document.getElementById('remainingCount').innerText = total;
+            document.getElementById('remainingCountHeader').innerText = total;
+        }
+
+        function generateWheelBulbs() {
+            const container = document.getElementById('wheelBulbRing');
+            container.querySelectorAll('.bulb-light').forEach(b => b.remove());
+            const bulbCount = 12;
+            for (let i = 0; i < bulbCount; i++) {
+                const angle = (i * (360 / bulbCount)) * (Math.PI / 180);
+                const radius = 48;
+                const x = 50 + radius * Math.cos(angle);
+                const y = 50 + radius * Math.sin(angle);
+
+                const bulb = document.createElement('div');
+                bulb.className = 'bulb-light absolute w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-yellow-200 border border-amber-600 shadow-md';
+                bulb.style.left = `${x}%`;
+                bulb.style.top = `${y}%`;
+                bulb.style.transform = 'translate(-50%, -50%)';
+                container.appendChild(bulb);
+            }
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = width / 2 - 20;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const total = activeConcepts.length;
+            document.getElementById('remainingCount').innerText = total;
+            document.getElementById('remainingCountHeader').innerText = total;
+
+            if (total === 0) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#EADFCF';
+                ctx.fill();
+                ctx.lineWidth = 10;
+                ctx.strokeStyle = '#D4AF37';
+                ctx.stroke();
+
+                ctx.fillStyle = '#5A3F05';
+                ctx.font = 'bold 36px Cairo';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('اكتملت جميع المفاهيم!', centerX, centerY);
+                return;
+            }
+
+            const arcSize = (2 * Math.PI) / total;
+
+            for (let i = 0; i < total; i++) {
+                const angle = currentAngle + i * arcSize;
+                const style = sliceColors[i % sliceColors.length];
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+                ctx.closePath();
+                ctx.fillStyle = style.bg;
+                ctx.fill();
+
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#D4AF37';
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + arcSize / 2);
+
+                ctx.textAlign = 'right';
+                ctx.fillStyle = style.text;
+                ctx.font = 'bold 32px Cairo';
+
+                const label = activeConcepts[i].label || `مفهوم ${i + 1}`;
+                ctx.fillText(label, radius - 80, 10);
+
+                ctx.fillStyle = style.accent;
+                ctx.beginPath();
+                ctx.arc(radius - 40, 0, 12, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = '#AA7C11';
+            ctx.stroke();
+        }
+
+        // SLOW AND REALISTIC SPIN ANIMATION LOGIC (NO SOUNDS AT ALL)
+        function spinWheel() {
+            if (isSpinning) return;
+
+            if (activeConcepts.length === 0) {
+                showVictoryModal();
+                return;
+            }
+
+            isSpinning = true;
+            document.getElementById('spinBtn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            const spinRounds = 7 + Math.floor(Math.random() * 5); // Extended spin rounds
+            const randomOffset = Math.random() * Math.PI * 2;
+            const targetAngle = currentAngle + (spinRounds * Math.PI * 2) + randomOffset;
+            
+            const duration = 8000; // 8 seconds slow spin
+            const startTime = performance.now();
+            const startAngle = currentAngle;
+
+            function animateSpin(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Slow realistic cubic ease-out curve
+                const easeOut = 1 - Math.pow(1 - progress, 4);
+                currentAngle = startAngle + (targetAngle - startAngle) * easeOut;
+
+                drawWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    isSpinning = false;
+                    document.getElementById('spinBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+                    calculateWinningSector();
+                }
+            }
+
+            requestAnimationFrame(animateSpin);
+        }
+
+        function calculateWinningSector() {
+            const total = activeConcepts.length;
+            if (total === 0) return;
+
+            const arcSize = (2 * Math.PI) / total;
+            let normalizedAngle = (currentAngle % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
+            
+            const pointerAngle = (3 * Math.PI / 2);
+            let winningIndex = Math.floor((pointerAngle - normalizedAngle + 2 * Math.PI) % (2 * Math.PI) / arcSize);
+            
+            winningIndex = (winningIndex + total) % total;
+            activeConceptIndex = winningIndex;
+
+            setTimeout(() => {
+                openConceptModal(activeConcepts[winningIndex]);
+            }, 500);
+        }
+
+        function openConceptModal(concept) {
+            document.getElementById('conceptModalTitle').innerText = concept.label || "مفهوم تربوي";
+            document.getElementById('conceptModalText').innerText = concept.definition;
+            
+            const iconEl = document.getElementById('conceptModalIcon');
+            iconEl.className = `fa-solid ${concept.icon || 'fa-lightbulb'}`;
+
+            document.getElementById('conceptModal').classList.remove('hidden');
+        }
+
+        function closeConceptModal() {
+            document.getElementById('conceptModal').classList.add('hidden');
+
+            // Remove concept from active array immediately after view
+            if (activeConceptIndex !== null && activeConcepts.length > 0) {
+                activeConcepts.splice(activeConceptIndex, 1);
+                activeConceptIndex = null;
+                saveData();
+                drawWheel();
+            }
+
+            if (activeConcepts.length === 0) {
+                setTimeout(showVictoryModal, 500);
+            }
+        }
+
+        function showVictoryModal() {
+            document.getElementById('victoryModal').classList.remove('hidden');
+        }
+
+        function resetGameProgress() {
+            activeConcepts = [...allConcepts];
+            saveData();
+            drawWheel();
+            document.getElementById('victoryModal').classList.add('hidden');
+        }
+
+        // ADMIN PANEL FUNCTIONS
+        function openAdminModal() {
+            document.getElementById('adminMainTitle').value = appTexts.mainTitle;
+            document.getElementById('adminSubtitle').value = appTexts.subtitle;
+            document.getElementById('adminHeaderBadge').value = appTexts.headerBadge;
+            document.getElementById('adminLeftQuoteMain').value = appTexts.leftQuoteMain;
+            document.getElementById('adminLeftQuoteSub').value = appTexts.leftQuoteSub;
+
+            renderAdminConceptsForm();
+            document.getElementById('adminModal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function renderAdminConceptsForm() {
+            const container = document.getElementById('adminConceptsContainer');
+            container.innerHTML = '';
+
+            allConcepts.forEach((c, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-2xl border border-amber-300 shadow-sm relative space-y-3';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="font-black text-amber-900 text-xs">شريحة #${idx + 1}</span>
+                        <button onclick="removeConcept(${idx})" class="text-rose-600 hover:text-rose-800 text-xs font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-trash"></i> حذف
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-1">اسم الشريحة (بالعجلة)</label>
+                            <input type="text" value="${c.label || ('مفهوم ' + (idx + 1))}" onchange="updateCProp(${idx}, 'label', this.value)" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 font-bold mb-1">أيقونة الشريحة (FontAwesome)</label>
+                            <input type="text" value="${c.icon || 'fa-lightbulb'}" onchange="updateCProp(${idx}, 'icon', this.value)" class="w-full p-2.5 rounded-xl border border-gray-300">
+                        </div>
+                    </div>
+                    <div class="text-xs">
+                        <label class="block text-gray-700 font-bold mb-1">نص التعريف كامل (الذي يظهر في البطاقة)</label>
+                        <textarea rows="2" onchange="updateCProp(${idx}, 'definition', this.value)" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold leading-relaxed">${c.definition}</textarea>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateCProp(idx, key, val) {
+            allConcepts[idx][key] = val;
+        }
+
+        function removeConcept(index) {
+            if (allConcepts.length <= 2) {
+                alert('يجب أن تحتوي العجلة على شريحتين على الأقل.');
+                return;
+            }
+            allConcepts.splice(index, 1);
+            renderAdminConceptsForm();
+        }
+
+        function addNewConceptField() {
+            const newId = allConcepts.length + 1;
+            allConcepts.push({
+                id: Date.now(),
+                label: `سؤال ${newId}`,
+                icon: "fa-lightbulb",
+                definition: "اكتب نص التعريف المفهوم هنا..."
+            });
+            renderAdminConceptsForm();
+        }
+
+        function saveAdminChanges() {
+            appTexts.mainTitle = document.getElementById('adminMainTitle').value;
+            appTexts.subtitle = document.getElementById('adminSubtitle').value;
+            appTexts.headerBadge = document.getElementById('adminHeaderBadge').value;
+            appTexts.leftQuoteMain = document.getElementById('adminLeftQuoteMain').value;
+            appTexts.leftQuoteSub = document.getElementById('adminLeftQuoteSub').value;
+
+            activeConcepts = [...allConcepts];
+
+            saveData();
+            renderUITexts();
+            drawWheel();
+            closeAdminModal();
+        }
+
+        function restoreDefaults() {
+            if (confirm('هل أنت تأكد من استعادة المفاهيم والنصوص الافتراضية؟')) {
+                appTexts = { ...DEFAULT_TEXTS };
+                allConcepts = [...DEFAULT_CONCEPTS];
+                activeConcepts = [...DEFAULT_CONCEPTS];
+                saveData();
+                renderUITexts();
+                drawWheel();
+                closeAdminModal();
+            }
+        }
+    </script>
+</body>
+</html>
